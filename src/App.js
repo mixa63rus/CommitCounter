@@ -53,7 +53,6 @@ class App extends React.Component {
 
   authListener = () => {
     fire.auth().onAuthStateChanged((user) => {
-      // console.log(user);
       if (user) {
         this.setState({ user, password: "" }, () => {
           fire.database().ref(`Users/${this.state.user.uid}/state `).once('value').then((snap) => {
@@ -62,10 +61,8 @@ class App extends React.Component {
             console.log('state', state)
           })
         });
-        // localStorage.setItem('user', user.uid);
       } else {
         this.setState({ user: null, password: "" });
-        // localStorage.removeItem('user');
       }
     });
   }
@@ -82,72 +79,150 @@ class App extends React.Component {
     this.setState({ password: e.target.value })
   }
 
-  onClickGithub =  (e) => {
+  onClickGithub = async (e) => {
     e.preventDefault();
     const git = [];
     const { name, select, data, userlist } = this.state;
     
-       axios.get(`https://api.github.com/users/${name}/repos`)
-      .then(res => res.data.map((item) => item.name))
-      .then(async(res) =>  axios.all(res.map((element) => axios.get(`https://api.github.com/repos/${name}/${element}/stats/participation`))))
-      .then(res =>  res.map((element) => element.data.owner))
-      .then(res => res.filter((element) => element.length !== 0))
-      .then(res => res.reduce((acc, array) => {
-        for (let i = 0; i < 52; i++) {
-          acc[i] += array[i];
-        } 
-        return acc;
-      }))
-      .then(res => { 
-        return res.map((element, id) => { 
-        const a = { github: element, week: id + 1 };
-        git.push(a);
-        return a;
-        })
-      }).then(() => {
-        if (data.length === 0 && userlist.length === 0) {
-          this.setState({ data: git, grafick: true })
-        } else if (data[0].github === undefined) {
-          const newdataG = data.map((element, index) => {
-            const newElem = {...element};
-            const a = Object.assign(newElem, git[index]);
-            return a;
-          });
-          this.setState({ data: newdataG, grafick: true });
-        } else if (Boolean(userlist.find(el => el.name === name && el.source === select))) {
-            console.log('yes user no add');
+      await axios.get(`https://api.github.com/users/${name}/repos`)
+      .then(async (res) => {
+        if (res.data.length < 1) {
+          const arr = [];
+          for (let i = 0; i < 52; i++) {
+              arr.push({ github: 0, week: i + 1 })
+          }
+
+          if (data.length === 0 && userlist.length === 0) {
+            this.setState({ data: arr, grafick: true })
+          } else if (data[0].github === undefined) {
+            const newdataG = data.map((element, index) => {
+              const newElem = {...element};
+              const a = Object.assign(newElem, arr[index]);
+              return a;
+            });
+            this.setState({ data: newdataG, grafick: true });
+          } else if (Boolean(userlist.find(el => el.name === name && el.source === select))) {
+              console.log('yes user no add');
+          } else {
+              const newDataG = data.map((el, index) => {
+              const github = el.github + arr[index].github;
+              return { ...data[index], github, week: index + 1 };
+              })
+              this.setState({ data: newDataG, grafick: true });
+          }
+            
+          if (userlist.length === 0) {
+            const firstUser = { name: this.state.name, source: select, data: arr };
+            this.setState({ userlist: [firstUser] }, () => {console.log('userlist = ', this.state.userlist)});
+          } else if (userlist.find(el => el.name === name && el.source === select)) {
+              console.log('yes list, yes user');
+          } else {
+            this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: arr }] });
+          }
+
+          fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
         } else {
-            const newDataG = data.map((el, index) => {
-            const github = el.github + git[index].github;
-            return { ...data[index], github, week: index + 1 };
-            })
-            this.setState({ data: newDataG, grafick: true });
-          }
-        if (userlist.length === 0) {
-          const firstUser = { name: this.state.name, source: select, data: git };
-          this.setState({ userlist: [firstUser] }, () => {console.log('userlist = ', this.state.userlist)});
-        }
-          else if (userlist.find(el => el.name === name && el.source === select)) {
-            console.log('yes list, yes user');
-          }
-          else {
-            this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: git }] });
-          }
-      }).then(() => {
-        fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
-        console.log("save");
+        await axios.get(`https://api.github.com/users/${name}/repos`)
+        .then(res => res.data.map((item) => item.name))
+        .then(async (res) => await axios.all(res.map(async (element) => await axios.get(`https://api.github.com/repos/${name}/${element}/stats/participation`))))
+        .then(res =>  res.map((element) => element.data.owner))
+        .then(res => res.filter((element) => element.length !== 0))
+        .then(res => res.reduce((acc, array) => {
+          for (let i = 0; i < 52; i++) {
+            acc[i] += array[i];
+          } 
+          return acc;
+        }))
+        .then(res => { 
+          return res.map((element, id) => { 
+          const a = { github: element, week: id + 1 };
+          git.push(a);
+          return a;
+          })
+        })
+        .then(() => {
+          if (data.length === 0 && userlist.length === 0) {
+            this.setState({ data: git, grafick: true })
+          } else if (data[0].github === undefined) {
+            const newdataG = data.map((element, index) => {
+              const newElem = {...element};
+              const a = Object.assign(newElem, git[index]);
+              return a;
+            });
+            this.setState({ data: newdataG, grafick: true });
+          } else if (Boolean(userlist.find(el => el.name === name && el.source === select))) {
+              console.log('yes user no add');
+          } else {
+              const newDataG = data.map((el, index) => {
+              const github = el.github + git[index].github;
+              return { ...data[index], github, week: index + 1 };
+              })
+              this.setState({ data: newDataG, grafick: true });
+            }
+          if (userlist.length === 0) {
+            const firstUser = { name: this.state.name, source: select, data: git };
+            this.setState({ userlist: [firstUser] }, () => {console.log('userlist = ', this.state.userlist)});
+          } else if (userlist.find(el => el.name === name && el.source === select)) {
+              console.log('yes list, yes user');
+          } else {
+              this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: git }] });
+          }})
+          .then(() => {
+            fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
+            console.log("save");
       })
       .catch(error => console.log('error: ', error));
-
       }
+    })
+    .catch(error => console.log(error))
+  }
       
     
-      onClickBitbucket =  (e) => {
-        e.preventDefault();
-        const bit = [];
-        const { name, select, data, userlist } = this.state;
+  onClickBitbucket = async (e) => {
+    e.preventDefault();
+    const bit = [];
+    const { name, select, data, userlist } = this.state;
     
-         axios.get(`https://bitbucket.org/!api/2.0/users/${this.state.name}/repositories`)
+    await axios.get(`https://bitbucket.org/!api/2.0/users/${this.state.name}/repositories`)
+    .then(async (res) => {
+      if (res.data.values.length < 1) {
+        const arr = [];
+        for (let i = 0; i < 52; i++) {
+          arr.push({ bitbucket: 0, week: i + 1 })
+        }
+
+        if (data.length === 0 && userlist.length === 0) {
+          this.setState({ data: arr, grafick: true })
+        } else if (data[0].bitbucket === undefined) {
+          const newdataB = data.map((element, index) => {
+            const newElem = {...element};
+            const a = Object.assign(newElem, arr[index])
+            return a;
+          });
+          this.setState({ data: newdataB, grafick: true });
+        } else if (Boolean(userlist.find(element => element.name === name && element.source === select))) {
+          console.log('yes user no add');
+        } else {
+          const newDataB = data.map((element, index) => {
+          const bitbucket = element.bitbucket + arr[index].bitbucket;
+          return { ...data[index], bitbucket, week: index + 1 }
+          })
+          this.setState({ data: newDataB, grafick: true })
+        }
+
+        if (userlist.length < 1) {
+          this.setState({ userlist: [{ name: this.state.name, source: select, data: arr }] });
+        } 
+        else if (userlist.find(el => el.name === name && el.source === select)) {
+          console.log('yes list, yes user');
+        }
+        else {
+          this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: arr }] });
+        }
+        fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
+        } else {
+
+        await axios.get(`https://bitbucket.org/!api/2.0/users/${this.state.name}/repositories`)
         .then(res => res.data.values.map((obj) => obj.name).map(element => element.replace(/ /g,'-')))
         .then(res =>  axios.all(res.map((element) => axios.get(`https://bitbucket.org/!api/2.0/repositories/${this.state.name}/${element}/commits`)))
         .then(res => res.map((element) => element.data))
@@ -164,10 +239,9 @@ class App extends React.Component {
             return element.then(res => {
               res ? bit.push(res) : console.log('ooops!');
             })
-          }
-          )
           })
-        ).then(() => {
+        }))
+        .then(() => {
           if (data.length === 0 && userlist.length === 0) {
             this.setState({ data: bit[0], grafick: true })
           } else if (data[0].bitbucket === undefined) {
@@ -186,13 +260,9 @@ class App extends React.Component {
             return { ...data[index], bitbucket, week: index + 1 }
             })
             this.setState({ data: newDataB, grafick: true })
-            console.log('add');
-            console.log('bit', bit);
-            console.log('newDataB', newDataB);
           }
 
           if (userlist.length < 1) {
-            console.log('no list')
             this.setState({ userlist: [{ name: this.state.name, source: select, data: bit[0] }] });
           } 
           else if (userlist.find(el => el.name === name && el.source === select)) {
@@ -200,14 +270,14 @@ class App extends React.Component {
           }
           else {
             this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: bit[0] }] });
-            console.log('yes list, no user');
           }
         }).then(() => {
           fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
-        console.log("save");
         })
         .catch(error => console.log('error: ', error));
-    }
+      }
+    }).catch(error => console.log(error))
+  }
 
   removeElement = id => {
     const { data, userlist } = this.state;
@@ -260,7 +330,7 @@ class App extends React.Component {
             <option value="github">GitHub</option>
             <option value="bitbucket">Bitbucket</option>
           </select>
-          <button className="btn-submit" type="submit" onClick={this.state.select === "github" ? this.onClickGithub : this.onClickBitbucket}>Find and Add</button>
+          <button className="btn-submit" type="submit" onClick={this.state.select === "github" ? this.onClickGithub : this.onClickBitbucket}>Find<br /> and <br />Add</button>
         </form>
         <button className="button-logout" type="submit" onClick={this.logout}>Logout</button>
           <ul>
