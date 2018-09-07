@@ -63,7 +63,7 @@
 }
 .deletebutton:hover,
 .deletebutton:active {
-  color: #66d8ed;
+  color:RED;
   transition: color 0.4s ease-in;
 }
 
