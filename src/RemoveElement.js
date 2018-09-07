@@ -12,7 +12,7 @@ export default class RemoveElement extends React.Component {
     render() {
         return (
             <div>
-                {this.props.list.name} - {this.props.list.source}<button className="deletebutton" onClick={(e) => this.removeElement(this.props.id)}>Delete</button>
+                {this.props.list.name} - {this.props.list.source}<button className="deletebutton" onClick={(e) => this.removeElement(this.props.id)}><b>X</b></button>
             </div>
         )
     }
