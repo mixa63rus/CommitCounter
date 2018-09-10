@@ -2,9 +2,9 @@ import React from 'react';
 import './App.css';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import iter from './iter';
-import LoginForm from './LoginForm';
-import RemoveElement from './RemoveElement';
+import iter from './Components/iter';
+import LoginForm from './Components/LoginForm';
+import RemoveElement from './Components/RemoveElement';
 import { fire } from './config/Fire';
 
 class App extends React.Component {
@@ -27,14 +27,13 @@ class App extends React.Component {
   login = async e => {
     e.preventDefault();
     await fire.auth().signInWithEmailAndPassword(this.state.email, this.state.password).catch((error) => {
-      alert(error.message)
+      alert(error.message);
       console.log(error);
     });
     if (this.state.user) {
     await fire.database().ref(`Users/${this.state.user.uid}/state `).once('value').then((snap) => {
       const state = snap.val();
-      this.setState({ ...state })
-      console.log('state', state)
+      this.setState({ ...state });
     })
   }}
 
@@ -48,7 +47,7 @@ class App extends React.Component {
 
   logout = () => {
     fire.auth().signOut();
-    this.setState({ name: "", select: "github", userlist: [], data: [], grafick: false })
+    this.setState({ name: "", select: "github", userlist: [], data: [], grafick: false });
   }
 
   authListener = () => {
@@ -57,8 +56,7 @@ class App extends React.Component {
         this.setState({ user, password: "" }, () => {
           fire.database().ref(`Users/${this.state.user.uid}/state `).once('value').then((snap) => {
             const state = snap.val();
-            this.setState({ ...state })
-            console.log('state', state)
+            this.setState({ ...state });
           })
         });
       } else {
@@ -72,11 +70,11 @@ class App extends React.Component {
   }
 
   handleChangeEmail = (e) => {
-    this.setState({ email: e.target.value })
+    this.setState({ email: e.target.value });
   }
 
   handleChangePassword = (e) => {
-    this.setState({ password: e.target.value })
+    this.setState({ password: e.target.value });
   }
 
   onClickGithub = async (e) => {
@@ -89,11 +87,11 @@ class App extends React.Component {
         if (res.data.length < 1) {
           const arr = [];
           for (let i = 0; i < 52; i++) {
-              arr.push({ github: 0, week: i + 1 })
+              arr.push({ github: 0, week: i + 1 });
           }
 
           if (data.length === 0 && userlist.length === 0) {
-            this.setState({ data: arr, grafick: true })
+            this.setState({ data: arr, grafick: true });
           } else if (data[0].github === undefined) {
             const newdataG = data.map((element, index) => {
               const newElem = {...element};
@@ -120,7 +118,7 @@ class App extends React.Component {
             this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: arr }] });
           }
 
-          fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
+          fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick });
         } else {
         await axios.get(`https://api.github.com/users/${name}/repos`)
         .then(res => res.data.map((item) => item.name))
@@ -142,7 +140,7 @@ class App extends React.Component {
         })
         .then(() => {
           if (data.length === 0 && userlist.length === 0) {
-            this.setState({ data: git, grafick: true })
+            this.setState({ data: git, grafick: true });
           } else if (data[0].github === undefined) {
             const newdataG = data.map((element, index) => {
               const newElem = {...element};
@@ -168,13 +166,12 @@ class App extends React.Component {
               this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: git }] });
           }})
           .then(() => {
-            fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
-            console.log("save");
+            fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick });
       })
       .catch(error => console.log('error: ', error));
       }
     })
-    .catch(error => console.log(error))
+    .catch(error => console.log(error));
   }
       
     
@@ -192,11 +189,11 @@ class App extends React.Component {
         }
 
         if (data.length === 0 && userlist.length === 0) {
-          this.setState({ data: arr, grafick: true })
+          this.setState({ data: arr, grafick: true });
         } else if (data[0].bitbucket === undefined) {
           const newdataB = data.map((element, index) => {
             const newElem = {...element};
-            const a = Object.assign(newElem, arr[index])
+            const a = Object.assign(newElem, arr[index]);
             return a;
           });
           this.setState({ data: newdataB, grafick: true });
@@ -205,9 +202,9 @@ class App extends React.Component {
         } else {
           const newDataB = data.map((element, index) => {
           const bitbucket = element.bitbucket + arr[index].bitbucket;
-          return { ...data[index], bitbucket, week: index + 1 }
-          })
-          this.setState({ data: newDataB, grafick: true })
+          return { ...data[index], bitbucket, week: index + 1 };
+          });
+          this.setState({ data: newDataB, grafick: true });
         }
 
         if (userlist.length < 1) {
@@ -219,7 +216,7 @@ class App extends React.Component {
         else {
           this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: arr }] });
         }
-        fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
+        fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick });
         } else {
 
         await axios.get(`https://bitbucket.org/!api/2.0/users/${this.state.name}/repositories`)
@@ -229,9 +226,8 @@ class App extends React.Component {
         .then(res => res.map(element => {
           const arr = [];
             for (let i = 0; i < 52; i++) {
-                arr.push({ bitbucket: 0, week: i + 1 })
+                arr.push({ bitbucket: 0, week: i + 1 });
             }
-            console.log('begin arr = ', arr)
           return iter(element, arr);
         }))
         .then(res => {
@@ -243,11 +239,11 @@ class App extends React.Component {
         }))
         .then(() => {
           if (data.length === 0 && userlist.length === 0) {
-            this.setState({ data: bit[0], grafick: true })
+            this.setState({ data: bit[0], grafick: true });
           } else if (data[0].bitbucket === undefined) {
             const newdataB = data.map((element, index) => {
               const newElem = {...element};
-              const a = Object.assign(newElem, bit[0][index])
+              const a = Object.assign(newElem, bit[0][index]);
               return a;
             });
             this.setState({ data: newdataB, grafick: true });
@@ -257,9 +253,9 @@ class App extends React.Component {
           } else {
             const newDataB = data.map((element, index) => {
             const bitbucket = element.bitbucket + bit[0][index].bitbucket;
-            return { ...data[index], bitbucket, week: index + 1 }
-            })
-            this.setState({ data: newDataB, grafick: true })
+            return { ...data[index], bitbucket, week: index + 1 };
+            });
+            this.setState({ data: newDataB, grafick: true });
           }
 
           if (userlist.length < 1) {
@@ -272,11 +268,11 @@ class App extends React.Component {
             this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: bit[0] }] });
           }
         }).then(() => {
-          fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
+          fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick });
         })
         .catch(error => console.log('error: ', error));
       }
-    }).catch(error => console.log(error))
+    }).catch(error => console.log(error));
   }
 
   removeElement = id => {
@@ -284,11 +280,10 @@ class App extends React.Component {
     console.log('id', id);
     const removedData = data.map((el, index) => {
       if (el.bitbucket && userlist[id].data[index].bitbucket) {
-        return {...el, bitbucket: el.bitbucket -= userlist[id].data[index].bitbucket}
+        return {...el, bitbucket: el.bitbucket -= userlist[id].data[index].bitbucket};
       } else if (el.github && userlist[id].data[index].github) {
-        return {...el, github: el.github -= userlist[id].data[index].github}
+        return {...el, github: el.github -= userlist[id].data[index].github};
       } else {
-        console.log('ooops!');
         return {...el};
       }
     })
@@ -296,12 +291,11 @@ class App extends React.Component {
     
     this.setState({ data: userlist.length === 1 ? [] : removedData, userlist: userlist.filter((el, index) => index !== id) }, () => {
       fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
-      console.log("save");
     });
   }
 
   handleSelectChange = (e) => {
-    this.setState({ select: e.target.value })
+    this.setState({ select: e.target.value });
   }
 
   renderForm() {
@@ -320,7 +314,7 @@ class App extends React.Component {
   }
 
   renderGraf() {
-    const { data, name, userlist } = this.state;
+    const { data, name } = this.state;
 
     return (
       <div>
@@ -333,9 +327,9 @@ class App extends React.Component {
           <button className="btn-submit" type="submit" onClick={this.state.select === "github" ? this.onClickGithub : this.onClickBitbucket}>Find<br /> and <br />Add</button>
         </form>
         <button className="button-logout" type="submit" onClick={this.logout}>Logout</button>
-          <ul>
+          <ul className="userlist">
             {this.state.userlist.map(
-            (element, index) => {return <RemoveElement className="list" data={userlist} list={element} key={index} id={index} removeElement={this.removeElement} />}
+            (element, index) => {return <RemoveElement className="list" list={element} key={index} id={index} removeElement={this.removeElement} />}
             )}
           </ul>
         <div className="container">
