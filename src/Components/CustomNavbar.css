@@ -1,0 +1,9 @@
+.navbar-default {
+    background-image: none;
+    border: none;
+    border-radius: 0;
+  }
+  
+  .navbar-default .navbar-brand {
+    color: blue;
+  }

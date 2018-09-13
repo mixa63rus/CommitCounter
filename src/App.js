@@ -1,9 +1,11 @@
 import React from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './App.css';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import iter from './Components/iter';
-import LoginForm from './Components/LoginForm';
+import { Button, Form, FormGroup, InputGroup, FormControl, DropdownButton, MenuItem, Grid } from 'react-bootstrap';
+import CustomNavbar from './Components/CustomNavbar';
 import RemoveElement from './Components/RemoveElement';
 import { fire } from './config/Fire';
 
@@ -17,7 +19,6 @@ class App extends React.Component {
     data: [],
     grafick: false,
     userlist: [],
-    authenticated: false,
   }
 
   componentDidMount(){
@@ -53,7 +54,7 @@ class App extends React.Component {
   authListener = () => {
     fire.auth().onAuthStateChanged((user) => {
       if (user) {
-        this.setState({ user, password: "" }, () => {
+        this.setState({ user, email: "", password: "" }, () => {
           fire.database().ref(`Users/${this.state.user.uid}/state `).once('value').then((snap) => {
             const state = snap.val();
             this.setState({ ...state });
@@ -294,22 +295,32 @@ class App extends React.Component {
     });
   }
 
-  handleSelectChange = (e) => {
-    this.setState({ select: e.target.value });
+  handleSelectChange = (eventKey) => {
+    this.setState({ select: eventKey });
   }
 
   renderForm() {
     return (
-      <div className="app">
-        <LoginForm 
+      <CustomNavbar 
         email = {this.state.email}
         password = {this.state.password}
         onChangeEmail={this.handleChangeEmail}
         onChangePassword = {this.handleChangePassword}
         onClickLogin={this.login}
         onClickSignup={this.signup}
-        />
-      </div>
+        user={this.state.user}
+      />
+      // <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: "#9ecdef" }}>
+      //   <img className="navbar-brand" src="https://cdn.discordapp.com/attachments/418025578348806144/449503275113381888/vied1.png" alt="logo" width="100" height="100" />
+      //   <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarExampleDefault" aria-controls="navbarExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+      //     <span className="navbar-toggle-icon"></span>
+      //   </button>
+      //   <div className="collapse navbar-collapse" id="navbarExampleDefault">
+      //     <LoginForm 
+          
+      //     />
+      //   </div>
+      // </nav>
     )
   }
 
@@ -318,32 +329,48 @@ class App extends React.Component {
 
     return (
       <div>
-        <form className="findform">
-          <input className="userinput" autoFocus onChange={this.handleChangeUser} value={name} />
-          <select className="select" value={this.state.select} onChange={this.handleSelectChange}> 
-            <option value="github">GitHub</option>
-            <option value="bitbucket">Bitbucket</option>
-          </select>
-          <button className="btn-submit" type="submit" onClick={this.state.select === "github" ? this.onClickGithub : this.onClickBitbucket}>Find<br /> and <br />Add</button>
-        </form>
-        <button className="button-logout" type="submit" onClick={this.logout}>Logout</button>
-          <ul className="userlist">
+        <CustomNavbar 
+          logout={this.logout}
+          user={this.state.user}
+        />
+        <Form inline>
+          <FormGroup>
+            <InputGroup>
+              <FormControl type="text" autoFocus onChange={this.handleChangeUser} value={name}/>
+              <DropdownButton
+                componentClass={InputGroup.Button}
+                id="input-dropdown-addon"
+                title={this.state.select}
+                pullRight
+              >
+                <MenuItem eventKey="github" onSelect={this.handleSelectChange}>github</MenuItem>
+                <MenuItem eventKey="bitbucket" onSelect={this.handleSelectChange}>bitbucket</MenuItem>
+              </DropdownButton>
+            </InputGroup>
+          </FormGroup>
+          <Button bsStyle="danger" type="submit" onClick={this.state.select === "github" ? this.onClickGithub : this.onClickBitbucket}>Find and Add</Button>
+        </Form>
+        <div className="userlist">
+          <ul>
             {this.state.userlist.map(
             (element, index) => {return <RemoveElement className="list" list={element} key={index} id={index} removeElement={this.removeElement} />}
             )}
           </ul>
-        <div className="container">
+        </div>  
+        <div>
           {this.state.grafick && Boolean(this.state.userlist.length) &&
           <div>
-            <BarChart width={800} height={500} data={data} margin={{top: 20, right: 30, left: 20, bottom: 5}}>
-              <CartesianGrid />
-              <XAxis dataKey="week" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="github" stackId="a" fill="red" />
-              <Bar dataKey="bitbucket" stackId="a" fill="#82ca9d" />
-            </BarChart>
+            <ResponsiveContainer minHeight={300} minWidth={350} width="100%">
+              <BarChart width={600} height={400} data={data} >
+                <CartesianGrid />
+                <XAxis dataKey="week" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="github" stackId="a" fill="red" />
+                <Bar dataKey="bitbucket" stackId="a" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>}
         </div>
       </div>
@@ -352,9 +379,17 @@ class App extends React.Component {
 
   render() { 
     return (
-      <div>
-        {this.state.user ? this.renderGraf() : this.renderForm()}
-      </div>
+      <Router>
+        <div>
+          {/* <Route exact path="/" component={Home} />
+          <Route path="/login" component={LoginForm} />
+          <Route path="/registration" component={RegistrationForm} />
+          <Route path="/workplace" component={} /> */}
+          <div>
+            {this.state.user ? this.renderGraf() : this.renderForm()}
+          </div>
+        </div>
+      </Router>
     )
   }
 }

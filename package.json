@@ -10,9 +10,12 @@
     "jQuery": "^1.7.4",
     "jquery": "^3.3.1",
     "material-components-web": "^0.38.2",
+    "popper.js": "^1.14.4",
     "react": "^15.6.1",
+    "react-bootstrap": "^0.32.4",
     "react-dom": "^15.6.1",
     "react-github-login": "^1.0.3",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
     "recharts": "^1.1.0"
   },

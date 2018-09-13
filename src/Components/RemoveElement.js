@@ -1,9 +1,10 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 
 export default function RemoveElement({ list, id, removeElement }) {
     return (
         <div>
-            {list.name} - {list.source}<button className="deletebutton" onClick={(e) => removeElement(id)}><b>X</b></button>
+            <b>{list.name} - {list.source}</b>  <Button bsSize="xsmall" bsStyle="danger" onClick={(e) => removeElement(id)}><b>X</b></Button>
         </div>
     )
 }
