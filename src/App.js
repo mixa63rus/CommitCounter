@@ -3,7 +3,7 @@ import './App.css';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import iter from './Components/iter';
-import { Button, Form, FormGroup, InputGroup, FormControl, DropdownButton, MenuItem, Grid } from 'react-bootstrap';
+import { Button, Form, FormGroup, InputGroup, FormControl, DropdownButton, MenuItem } from 'react-bootstrap';
 import CustomNavbar from './Components/CustomNavbar';
 import RemoveElement from './Components/RemoveElement';
 import { fire } from './config/Fire';

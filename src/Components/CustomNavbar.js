@@ -1,6 +1,5 @@
 import React from 'react';
 import { Navbar, Nav, NavItem, Button, Modal } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import RegistrationForm from './RegistrationForm';
 import LoginForm from './LoginForm';
 import "./CustomNavbar.css"
@@ -31,9 +30,7 @@ export default class CustomNavbar extends React.Component {
                 <Navbar default collapseOnSelect>
                     <Navbar.Header>
                         <Navbar.Brand>
-                            <Link to="/">
                                 VIED
-                            </Link>
                         </Navbar.Brand>
                         <Navbar.Toggle/>
                     </Navbar.Header>
