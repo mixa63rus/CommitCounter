@@ -1,5 +1,4 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './App.css';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -14,6 +13,7 @@ class App extends React.Component {
     user: {},
     email: "",
     password: "",
+    nickname: "",
     name: "",
     select: "github",
     data: [],
@@ -29,6 +29,7 @@ class App extends React.Component {
     e.preventDefault();
     await fire.auth().signInWithEmailAndPassword(this.state.email, this.state.password).catch((error) => {
       alert(error.message);
+      this.setState({ password: ""})
       console.log(error);
     });
     if (this.state.user) {
@@ -38,17 +39,26 @@ class App extends React.Component {
     })
   }}
 
-  signup = e => {
+  signup = async (e) => {
     e.preventDefault();
-    fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).catch((error) => {
+
+    if (this.state.nickname.length < 1) {
+      alert("Please enter  your nickname");
+    } else {
+    await fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).catch((error) => {
       alert(error.message);
       console.log(error);
-    })
+  })
+     
+    await fire.database().ref(`Users/${this.state.user.uid}/state `).set({ nickname: this.state.nickname }).catch((error) => {
+      alert(error.message);
+        console.log(error);
+    })}
   }
 
   logout = () => {
     fire.auth().signOut();
-    this.setState({ name: "", select: "github", userlist: [], data: [], grafick: false });
+    this.setState({ nickname: "", name: "", select: "github", userlist: [], data: [], grafick: false });
   }
 
   authListener = () => {
@@ -67,7 +77,8 @@ class App extends React.Component {
   }
 
   handleChangeUser = e => {
-    this.setState({ name: e.target.value });
+    
+    this.setState({ name: e.target.value.toLowerCase() });
   }
 
   handleChangeEmail = (e) => {
@@ -77,6 +88,11 @@ class App extends React.Component {
   handleChangePassword = (e) => {
     this.setState({ password: e.target.value });
   }
+
+  handleChangeNickName = (e) => {
+    this.setState({ nickname: e.target.value });
+  }
+
 
   onClickGithub = async (e) => {
     e.preventDefault();
@@ -119,7 +135,7 @@ class App extends React.Component {
             this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: arr }] });
           }
 
-          fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick });
+          fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick, nickname: this.state.nickname });
         } else {
         await axios.get(`https://api.github.com/users/${name}/repos`)
         .then(res => res.data.map((item) => item.name))
@@ -142,7 +158,7 @@ class App extends React.Component {
         .then(() => {
           if (data.length === 0 && userlist.length === 0) {
             this.setState({ data: git, grafick: true });
-          } else if (data[0].github === undefined) {
+          } else if (data[0].github === undefined) {  
             const newdataG = data.map((element, index) => {
               const newElem = {...element};
               const a = Object.assign(newElem, git[index]);
@@ -167,7 +183,7 @@ class App extends React.Component {
               this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: git }] });
           }})
           .then(() => {
-            fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick });
+            fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick, nickname: this.state.nickname });
       })
       .catch(error => console.log('error: ', error));
       }
@@ -217,7 +233,7 @@ class App extends React.Component {
         else {
           this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: arr }] });
         }
-        fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick });
+        fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick, nickname: this.state.nickname });
         } else {
 
         await axios.get(`https://bitbucket.org/!api/2.0/users/${this.state.name}/repositories`)
@@ -269,7 +285,7 @@ class App extends React.Component {
             this.setState({ userlist: [...userlist, { name: this.state.name, source: select, data: bit[0] }] });
           }
         }).then(() => {
-          fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick });
+          fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick, nickname: this.state.nickname });
         })
         .catch(error => console.log('error: ', error));
       }
@@ -288,10 +304,9 @@ class App extends React.Component {
         return {...el};
       }
     })
-
     
     this.setState({ data: userlist.length === 1 ? [] : removedData, userlist: userlist.filter((el, index) => index !== id) }, () => {
-      fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick })
+      fire.database().ref(`Users/${this.state.user.uid}/state `).set({ data: this.state.data, userlist: this.state.userlist, grafick: this.state.grafick, nickname: this.state.nickname })
     });
   }
 
@@ -304,8 +319,10 @@ class App extends React.Component {
       <CustomNavbar 
         email = {this.state.email}
         password = {this.state.password}
+        nickname = {this.state.nickname}
         onChangeEmail={this.handleChangeEmail}
         onChangePassword = {this.handleChangePassword}
+        onChangeNickName = {this.handleChangeNickName}
         onClickLogin={this.login}
         onClickSignup={this.signup}
         user={this.state.user}
@@ -329,11 +346,27 @@ class App extends React.Component {
 
     return (
       <div>
-        <CustomNavbar 
+        <CustomNavbar
+          nickname={this.state.nickname}
           logout={this.logout}
           user={this.state.user}
         />
         <Form inline>
+        {this.state.grafick && Boolean(this.state.userlist.length) &&
+          <div className="graf">
+            <ResponsiveContainer minHeight={200} minWidth={350} width="90%" height="50%">
+              <BarChart width={600} height={400} data={data} >
+                <CartesianGrid />
+                <XAxis dataKey="week" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="github" stackId="a" fill="red" />
+                <Bar dataKey="bitbucket" stackId="a" fill="blue" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>}
+
           <FormGroup>
             <InputGroup>
               <FormControl type="text" autoFocus onChange={this.handleChangeUser} value={name}/>
@@ -351,27 +384,13 @@ class App extends React.Component {
           <Button bsStyle="danger" type="submit" onClick={this.state.select === "github" ? this.onClickGithub : this.onClickBitbucket}>Find and Add</Button>
         </Form>
         <div className="userlist">
-          <ul>
+          <ul style={{ fontSize: "20px"}}>
             {this.state.userlist.map(
             (element, index) => {return <RemoveElement className="list" list={element} key={index} id={index} removeElement={this.removeElement} />}
             )}
           </ul>
         </div>  
         <div>
-          {this.state.grafick && Boolean(this.state.userlist.length) &&
-          <div>
-            <ResponsiveContainer minHeight={300} minWidth={350} width="100%">
-              <BarChart width={600} height={400} data={data} >
-                <CartesianGrid />
-                <XAxis dataKey="week" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="github" stackId="a" fill="red" />
-                <Bar dataKey="bitbucket" stackId="a" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>}
         </div>
       </div>
     )
@@ -379,17 +398,9 @@ class App extends React.Component {
 
   render() { 
     return (
-      <Router>
-        <div>
-          {/* <Route exact path="/" component={Home} />
-          <Route path="/login" component={LoginForm} />
-          <Route path="/registration" component={RegistrationForm} />
-          <Route path="/workplace" component={} /> */}
           <div>
             {this.state.user ? this.renderGraf() : this.renderForm()}
           </div>
-        </div>
-      </Router>
     )
   }
 }

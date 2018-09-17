@@ -5,5 +5,22 @@
   }
   
   .navbar-default .navbar-brand {
-    color: blue;
+    /* float: left !important; */
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 250%;
+    color: white;
+    line-height: 77%;
+  }
+
+  .navbar-nav {
+    font-family: 'Times New Roman', Times, serif;
+    color: white;
+  }
+
+  .navbar-default .navbar-nav>li>a {
+    font-family: 'Times New Roman', Times, serif;
+    color: white;
+    font-size: 150%;
+    line-height: 150%;
   }

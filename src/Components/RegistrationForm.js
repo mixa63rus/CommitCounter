@@ -3,7 +3,7 @@ import { Form, FormGroup, Col, ControlLabel, Button } from 'react-bootstrap';
 
 import Input from './Input';
 
-function RegistrationForm({ onClickSignup, onChangeEmail, onChangePassword, email, password }) {
+function RegistrationForm({ onClickSignup, onChangeEmail, onChangePassword, onChangeNickName, email, password, nickname }) {
     return (
         <Form horizontal>
             <FormGroup>
@@ -20,6 +20,14 @@ function RegistrationForm({ onClickSignup, onChangeEmail, onChangePassword, emai
                 </Col>
                 <Col xs={6} sm={6}>
                     <Input type="password" name="password" placeholder="password" onChange={onChangePassword} value={password}/>
+                </Col>
+            </FormGroup>
+            <FormGroup>
+                <Col componentClass={ControlLabel} xs={4} sm={4}>
+                    NickName
+                </Col>
+                <Col xs={6} sm={6}>
+                    <Input type="text" name="text" placeholder="nickname" onChange={onChangeNickName} value={nickname}/>
                 </Col>
             </FormGroup>
             <FormGroup>

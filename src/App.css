@@ -1,5 +1,9 @@
+.navbar {
+    background-color: rgb(77, 124, 168);
+}
 
 .form-inline {
+    position: relative;
     margin-top: 10px;
     margin-bottom: 10px;
 }
@@ -8,3 +12,63 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+.userlist>ul {
+    padding-left: 3%;
+}
+
+.container {
+    margin-left: 15px;
+    width: auto;
+}
+
+.graf {
+    position: relative;
+    right: 5%;
+    float: right;
+}
+
+@media (min-width: 1000px) {
+    .graf {
+        width: 675px;
+    }
+}
+
+
+@media (min-width: 1000px) {
+    .graf {
+        width: 675px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .graf {
+        width: 875px;
+        height: 575px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .graf {
+        width: 1075px;
+        height: 775px;
+    }
+}
+
+/* @media (min-width: 1400px) {
+    .container {
+        width: 1370px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .container {
+        width: 1570px;
+    }
+}
+
+@media (min-width: 1800px) {
+    .container {
+        width: 1770px;
+    }
+} */
