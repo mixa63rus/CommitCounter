@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import iter from './Components/iter';
 import { Button, Form, FormGroup, InputGroup, FormControl, DropdownButton, MenuItem } from 'react-bootstrap';
 import CustomNavbar from './Components/CustomNavbar';
 import RemoveElement from './Components/RemoveElement';
 import { fire } from './config/Fire';
+import Chart from './Components/Chart';
 
 class App extends React.Component {
   state = {
@@ -77,19 +77,18 @@ class App extends React.Component {
   }
 
   handleChangeUser = e => {
-    
     this.setState({ name: e.target.value.toLowerCase() });
   }
 
-  handleChangeEmail = (e) => {
+  handleChangeEmail = e => {
     this.setState({ email: e.target.value });
   }
 
-  handleChangePassword = (e) => {
+  handleChangePassword = e => {
     this.setState({ password: e.target.value });
   }
 
-  handleChangeNickName = (e) => {
+  handleChangeNickName = e => {
     this.setState({ nickname: e.target.value });
   }
 
@@ -327,17 +326,6 @@ class App extends React.Component {
         onClickSignup={this.signup}
         user={this.state.user}
       />
-      // <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: "#9ecdef" }}>
-      //   <img className="navbar-brand" src="https://cdn.discordapp.com/attachments/418025578348806144/449503275113381888/vied1.png" alt="logo" width="100" height="100" />
-      //   <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarExampleDefault" aria-controls="navbarExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-      //     <span className="navbar-toggle-icon"></span>
-      //   </button>
-      //   <div className="collapse navbar-collapse" id="navbarExampleDefault">
-      //     <LoginForm 
-          
-      //     />
-      //   </div>
-      // </nav>
     )
   }
 
@@ -352,21 +340,7 @@ class App extends React.Component {
           user={this.state.user}
         />
         <Form inline>
-        {this.state.grafick && Boolean(this.state.userlist.length) &&
-          <div className="graf">
-            <ResponsiveContainer minHeight={200} minWidth={350} width="90%" height="50%">
-              <BarChart width={600} height={400} data={data} >
-                <CartesianGrid />
-                <XAxis dataKey="week" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="github" stackId="a" fill="red" />
-                <Bar dataKey="bitbucket" stackId="a" fill="blue" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>}
-
+        {this.state.grafick && Boolean(this.state.userlist.length) && <Chart data={data}/>}
           <FormGroup>
             <InputGroup>
               <FormControl type="text" autoFocus onChange={this.handleChangeUser} value={name}/>
@@ -390,8 +364,6 @@ class App extends React.Component {
             )}
           </ul>
         </div>  
-        <div>
-        </div>
       </div>
     )
   }
