@@ -45,15 +45,20 @@ class App extends React.Component {
     if (this.state.nickname.length < 1) {
       alert("Please enter  your nickname");
     } else {
-    await fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).catch((error) => {
+    await fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
+    .then(async () => {
+      await fire.database().ref(`Users/${this.state.user.uid}/state `).set({ nickname: this.state.nickname }).catch((error) => {
+        alert(error.message);
+          console.log(error);
+      })
+    })
+    .catch((error) => {
       alert(error.message);
+      this.setState({ password: "", nickname: "" });
       console.log(error);
   })
      
-    await fire.database().ref(`Users/${this.state.user.uid}/state `).set({ nickname: this.state.nickname }).catch((error) => {
-      alert(error.message);
-        console.log(error);
-    })}
+    }
   }
 
   logout = () => {
