@@ -6,7 +6,7 @@ import Input from './Input';
 function LoginForm({ onClickLogin, onChangeEmail, onChangePassword, email, password }) {
     return (
         <Form horizontal>
-            <FormGroup controlId="formHorizontalEmail">
+            <FormGroup>
                 <Col componentClass={ControlLabel} xs={4} sm={4}>
                     Email
                 </Col>
@@ -14,7 +14,7 @@ function LoginForm({ onClickLogin, onChangeEmail, onChangePassword, email, passw
                     <Input type="email" name="email" placeholder="email" onChange={onChangeEmail} value={email}/>
                 </Col>
             </FormGroup>
-            <FormGroup controlId="formHorizontalEmail">
+            <FormGroup>
                 <Col componentClass={ControlLabel} xs={4} sm={4}>
                     Password
                 </Col>
@@ -22,11 +22,11 @@ function LoginForm({ onClickLogin, onChangeEmail, onChangePassword, email, passw
                     <Input type="password" name="password" placeholder="password" onChange={onChangePassword} value={password}/>
                 </Col>
             </FormGroup>
-            <FormGroup controlId="formHorizontalEmail">
+            <FormGroup>
                 <Col componentClass={ControlLabel} xs={4} sm={4}>
                 </Col>
                 <Col xs={6} sm={6}>
-                    <Button bsStyle="success" onClick={onClickLogin}>SignIn</Button>
+                    <Button bsStyle="success" type="submit" onClick={onClickLogin}>SignIn</Button>
                 </Col>
             </FormGroup>
         </Form>

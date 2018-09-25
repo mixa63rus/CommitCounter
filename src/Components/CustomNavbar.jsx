@@ -1,6 +1,5 @@
 import React from 'react';
 import { Navbar, Nav, NavItem, Button, Modal } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import RegistrationForm from './RegistrationForm';
 import LoginForm from './LoginForm';
 import "./CustomNavbar.css"
@@ -31,13 +30,11 @@ export default class CustomNavbar extends React.Component {
                 <Navbar default collapseOnSelect>
                     <Navbar.Header>
                         <Navbar.Brand>
-                            <Link to="/">
                                 VIED
-                            </Link>
                         </Navbar.Brand>
-                        <Navbar.Toggle />
+                        <Navbar.Toggle/>
                     </Navbar.Header>
-                    <Navbar.Collapse >
+                    <Navbar.Collapse>
                     {!this.props.user ?
                         <Nav pullRight>
                             <NavItem eventKey={1}>
@@ -46,7 +43,15 @@ export default class CustomNavbar extends React.Component {
                             <NavItem eventKey={2}>
                                 <Button bsStyle="primary" style={{outline: "none"}} onClick={this.handleShowSignUp}>SignUp</Button>
                             </NavItem>
-                        </Nav> : <Nav pullRight><NavItem eventKey={1}><Button bsStyle="danger" onClick={this.props.logout}>Logout</Button></NavItem></Nav>}
+                        </Nav> : 
+                        <Nav pullRight>
+                            <NavItem eventKey={1}>
+                                {this.props.nickname}
+                            </NavItem>
+                            <NavItem eventKey={2}>
+                                <Button bsStyle="danger" onClick={this.props.logout}>Logout</Button>
+                            </NavItem>
+                        </Nav>}
                     </Navbar.Collapse>
                 </Navbar>
                 <Modal show={this.state.showSignUp} onHide={this.handleClose}>
@@ -57,9 +62,11 @@ export default class CustomNavbar extends React.Component {
                         <RegistrationForm 
                             email = {this.props.email}
                             password = {this.props.password}
+                            nickname = {this.props.nickname}
                             onChangeEmail={this.props.onChangeEmail}
                             onChangePassword = {this.props.onChangePassword}
-                            onClickSignup={this.props.onClickSignup}                         
+                            onClickSignup={this.props.onClickSignup} 
+                            onChangeNickName={this.props.onChangeNickName}                        
                         />
                     </Modal.Body>
                     <Modal.Footer>
